@@ -2,6 +2,8 @@ import { Sidebar } from "@/components/sidebar";
 import { getActiveAccount } from "@/lib/account";
 import { TARGET_INSTAGRAM } from "@/lib/config";
 
+export const dynamic = "force-dynamic";
+
 export default async function AppLayout({
   children,
 }: {

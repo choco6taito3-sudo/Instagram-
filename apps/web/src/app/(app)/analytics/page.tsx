@@ -3,7 +3,7 @@ import { MetricCard } from "@/components/metric-card";
 import { InsightsChart } from "@/components/charts/insights-chart";
 import { getActiveAccount } from "@/lib/account";
 import { prisma } from "@/lib/prisma";
-import { generateDemoInsights } from "@/lib/demo-data";
+import { generateDemoInsights, toChartPoint, type InsightChartPoint, type MediaPostSummary } from "@/lib/demo-data";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { AnalyticsPeriodSelector } from "./period-selector";
@@ -43,13 +43,8 @@ export default async function AnalyticsPage({
   const data = await getAnalytics(period);
   const isDemo = !data;
 
-  const insights = data?.insights.length
-    ? data.insights.map((i) => ({
-        date: format(i.date, "yyyy-MM-dd"),
-        reach: i.reach,
-        impressions: i.impressions,
-        engagementRate: i.engagementRate,
-      }))
+  const insights: InsightChartPoint[] = data?.insights.length
+    ? data.insights.map(toChartPoint)
     : generateDemoInsights(period);
 
   const totals = insights.reduce(
@@ -97,7 +92,7 @@ export default async function AnalyticsPage({
         </CardHeader>
         <div className="space-y-3">
           {(data?.posts || []).length > 0 ? (
-            data!.posts.map((post, i) => (
+            (data?.posts as MediaPostSummary[] | undefined)?.map((post, i) => (
               <div
                 key={post.id}
                 className="flex items-center justify-between rounded-lg border border-zinc-100 p-3 dark:border-zinc-800"

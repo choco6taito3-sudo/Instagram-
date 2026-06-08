@@ -1,6 +1,37 @@
 import { subDays, format } from "date-fns";
 
-export function generateDemoInsights(days = 30) {
+export type InsightChartPoint = {
+  date: string;
+  reach: number;
+  impressions: number;
+  engagementRate: number;
+};
+
+export type MediaPostSummary = {
+  id: string;
+  caption: string | null;
+  mediaType: string;
+  reach: number;
+  engagementRate: number;
+};
+
+export type InsightRecord = {
+  date: Date;
+  reach: number;
+  impressions: number;
+  engagementRate: number;
+};
+
+export function toChartPoint(i: InsightRecord): InsightChartPoint {
+  return {
+    date: format(i.date, "yyyy-MM-dd"),
+    reach: i.reach,
+    impressions: i.impressions,
+    engagementRate: i.engagementRate,
+  };
+}
+
+export function generateDemoInsights(days = 30): InsightChartPoint[] {
   return Array.from({ length: days }, (_, i) => {
     const date = subDays(new Date(), days - i - 1);
     const reach = Math.floor(800 + Math.random() * 1200);

@@ -3,7 +3,7 @@ import { MetricCard } from "@/components/metric-card";
 import { InsightsChart } from "@/components/charts/insights-chart";
 import { getActiveAccount } from "@/lib/account";
 import { prisma } from "@/lib/prisma";
-import { generateDemoInsights } from "@/lib/demo-data";
+import { generateDemoInsights, toChartPoint, type InsightChartPoint } from "@/lib/demo-data";
 import { TARGET_INSTAGRAM } from "@/lib/config";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
@@ -57,13 +57,8 @@ export default async function DashboardPage() {
     name: TARGET_INSTAGRAM.displayName,
   };
 
-  const insights = data?.insights.length
-    ? data.insights.map((i) => ({
-        date: format(i.date, "yyyy-MM-dd"),
-        reach: i.reach,
-        impressions: i.impressions,
-        engagementRate: i.engagementRate,
-      }))
+  const insights: InsightChartPoint[] = data?.insights.length
+    ? data.insights.map(toChartPoint)
     : generateDemoInsights(30);
 
   const latest = insights[insights.length - 1];

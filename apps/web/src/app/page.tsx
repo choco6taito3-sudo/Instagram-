@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Instagram } from "lucide-react";
 import { TARGET_INSTAGRAM } from "@/lib/config";
 
+export const dynamic = "force-dynamic";
+
 const ERROR_MESSAGES: Record<string, string> = {
   auth_failed:
     "Facebookログインがキャンセルまたは拒否されました。もう一度お試しください。",

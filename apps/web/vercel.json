@@ -1,4 +1,6 @@
 {
+  "installCommand": "cd ../.. && npm install",
+  "buildCommand": "cd ../.. && npm run db:generate && npm run build --workspace=web",
   "crons": [
     {
       "path": "/api/cron/trigger-sync",
