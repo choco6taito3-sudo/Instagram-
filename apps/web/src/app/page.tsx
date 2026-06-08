@@ -17,9 +17,9 @@ const ERROR_MESSAGES: Record<string, string> = {
     "Metaアプリが未設定です。.env に META_APP_ID と META_APP_SECRET を設定し、devサーバーを再起動してください。",
 };
 
-const isMetaConfigured = Boolean(
-  process.env.META_APP_ID?.trim() && process.env.META_APP_SECRET?.trim()
-);
+const hasMetaAppId = Boolean(process.env.META_APP_ID?.trim());
+const hasMetaAppSecret = Boolean(process.env.META_APP_SECRET?.trim());
+const isMetaConfigured = hasMetaAppId && hasMetaAppSecret;
 
 export default async function HomePage({
   searchParams,
@@ -61,7 +61,30 @@ export default async function HomePage({
         <div className="mt-8 max-w-md rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           <p className="font-medium">Metaアプリの設定が必要です</p>
           <p className="mt-2">
-            1.{" "}
+            連携ボタンを表示するには、次の環境変数を設定してください。
+          </p>
+          <ul className="mt-2 space-y-1">
+            <li>
+              <code className="text-xs">META_APP_ID</code> —{" "}
+              {hasMetaAppId ? "✅ 設定済" : "❌ 未設定"}
+            </li>
+            <li>
+              <code className="text-xs">META_APP_SECRET</code> —{" "}
+              {hasMetaAppSecret ? "✅ 設定済" : "❌ 未設定"}
+            </li>
+          </ul>
+          <p className="mt-3 font-medium">Vercel での設定手順</p>
+          <ol className="mt-2 list-inside list-decimal space-y-1">
+            <li>Vercel → プロジェクト → Settings → Environment Variables</li>
+            <li>上記2つを追加（Environment: Production にチェック）</li>
+            <li>Deployments → 最新 → Redeploy</li>
+          </ol>
+          <p className="mt-3">
+            <strong>ローカル:</strong> プロジェクト直下の{" "}
+            <code className="text-xs">.env</code> に同じ値を設定
+          </p>
+          <p className="mt-2">
+            アプリ作成:{" "}
             <a
               href="https://developers.facebook.com/"
               className="underline"
@@ -70,14 +93,7 @@ export default async function HomePage({
             >
               Meta for Developers
             </a>
-            でアプリを作成
           </p>
-          <p className="mt-1">
-            2. <code className="text-xs">.env</code> に{" "}
-            <code className="text-xs">META_APP_ID</code> と{" "}
-            <code className="text-xs">META_APP_SECRET</code> を設定
-          </p>
-          <p className="mt-1">3. <code className="text-xs">npm run dev:restart</code> で再起動</p>
         </div>
       )}
       <p className="mt-4 text-sm text-zinc-400">
