@@ -59,7 +59,7 @@ export default async function CompetitorsPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">競合分析</h1>
           <p className="text-zinc-500">同ジャンルアカウントの動向（公開データのみ）</p>

@@ -116,7 +116,7 @@ export default async function SchedulePage() {
               return (
                 <div
                   key={post.id}
-                  className="flex items-center justify-between rounded-lg border border-zinc-100 p-4 dark:border-zinc-800"
+                  className="flex flex-col gap-3 rounded-lg border border-zinc-100 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800"
                 >
                   <div>
                     <div className="flex items-center gap-2">

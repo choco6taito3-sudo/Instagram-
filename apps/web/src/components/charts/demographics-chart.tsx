@@ -28,7 +28,8 @@ export function DemographicsDonutChart({
   }));
 
   return (
-    <ResponsiveContainer width="100%" height={280}>
+    <div className="h-[240px] w-full min-w-0 md:h-[280px]">
+      <ResponsiveContainer width="100%" height="100%">
       <PieChart>
         <Pie
           data={chartData}
@@ -50,7 +51,8 @@ export function DemographicsDonutChart({
         <Tooltip />
         <Legend />
       </PieChart>
-    </ResponsiveContainer>
+      </ResponsiveContainer>
+    </div>
   );
 }
 
@@ -60,14 +62,16 @@ export function DemographicsBarChart({
   data: { value: string; count: number; percentage: number }[];
 }) {
   return (
-    <ResponsiveContainer width="100%" height={Math.max(200, data.length * 40)}>
-      <BarChart data={data} layout="vertical" margin={{ left: 80 }}>
+    <div className="h-[200px] w-full min-w-0" style={{ minHeight: Math.max(200, data.length * 40) }}>
+      <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={data} layout="vertical" margin={{ left: 4, right: 8 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7" />
-        <XAxis type="number" tick={{ fontSize: 12 }} />
-        <YAxis type="category" dataKey="value" tick={{ fontSize: 12 }} width={70} />
+        <XAxis type="number" tick={{ fontSize: 11 }} />
+        <YAxis type="category" dataKey="value" tick={{ fontSize: 11 }} width={56} />
         <Tooltip />
         <Bar dataKey="count" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
       </BarChart>
-    </ResponsiveContainer>
+      </ResponsiveContainer>
+    </div>
   );
 }

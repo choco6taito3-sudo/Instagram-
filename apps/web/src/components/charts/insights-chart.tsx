@@ -20,7 +20,8 @@ interface InsightData {
 
 export function InsightsChart({ data }: { data: InsightData[] }) {
   return (
-    <ResponsiveContainer width="100%" height={350}>
+    <div className="h-[260px] w-full min-w-0 md:h-[350px]">
+      <ResponsiveContainer width="100%" height="100%">
       <LineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7" />
         <XAxis
@@ -65,6 +66,7 @@ export function InsightsChart({ data }: { data: InsightData[] }) {
           dot={false}
         />
       </LineChart>
-    </ResponsiveContainer>
+      </ResponsiveContainer>
+    </div>
   );
 }

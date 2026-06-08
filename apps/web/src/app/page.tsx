@@ -48,7 +48,7 @@ export default async function HomePage({
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 shadow-lg">
         <Instagram className="h-8 w-8 text-white" />
       </div>
-      <h1 className="mt-6 text-4xl font-bold text-zinc-900">Instagram運用ツール</h1>
+      <h1 className="mt-6 text-3xl font-bold text-zinc-900 sm:text-4xl">Instagram運用ツール</h1>
       <p className="mt-3 max-w-md text-center text-zinc-600">
         @{TARGET_INSTAGRAM.username} のアカウント分析・予約投稿・競合分析・AIレポートを一元管理
       </p>

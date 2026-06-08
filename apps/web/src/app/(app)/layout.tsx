@@ -21,9 +21,11 @@ export default async function AppLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <DemoBanner />
-      <div className="flex flex-1">
+      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
         <Sidebar username={username} />
-        <main className="flex-1 overflow-auto p-8">{children}</main>
+        <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8">
+          {children}
+        </main>
       </div>
     </div>
   );
