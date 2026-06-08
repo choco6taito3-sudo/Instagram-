@@ -1,0 +1,270 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id              String   @id @default(cuid())
+  igUserId        String   @unique @map("ig_user_id")
+  username        String
+  name            String?
+  profilePicture  String?  @map("profile_picture")
+  followersCount  Int      @default(0) @map("followers_count")
+  accessToken     String   @map("access_token")
+  tokenExpiresAt  DateTime @map("token_expires_at")
+  pageId          String?  @map("page_id")
+  pageAccessToken String?  @map("page_access_token")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  insightsDaily         InsightsDaily[]
+  audienceDemographics  AudienceDemographic[]
+  audienceOnline        AudienceOnline[]
+  mediaPosts            MediaPost[]
+  competitors           Competitor[]
+  scheduledPosts        ScheduledPost[]
+  hashtagSets           HashtagSet[]
+  comments              Comment[]
+  messages              Message[]
+  aiReports             AiReport[]
+  replyTemplates        ReplyTemplate[]
+  performanceAlerts     PerformanceAlert[]
+
+  @@map("accounts")
+}
+
+model InsightsDaily {
+  id              String   @id @default(cuid())
+  accountId       String   @map("account_id")
+  date            DateTime @db.Date
+  reach           Int      @default(0)
+  impressions     Int      @default(0)
+  accountsEngaged Int      @default(0) @map("accounts_engaged")
+  followerCount   Int      @default(0) @map("follower_count")
+  profileViews    Int      @default(0) @map("profile_views")
+  engagementRate  Float    @default(0) @map("engagement_rate")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, date])
+  @@map("insights_daily")
+}
+
+model AudienceDemographic {
+  id         String   @id @default(cuid())
+  accountId  String   @map("account_id")
+  type       String
+  dimension  String
+  value      String
+  count      Int      @default(0)
+  percentage Float    @default(0)
+  snapshotAt DateTime @map("snapshot_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, type, snapshotAt])
+  @@map("audience_demographics")
+}
+
+model AudienceOnline {
+  id         String   @id @default(cuid())
+  accountId  String   @map("account_id")
+  dayOfWeek  Int      @map("day_of_week")
+  hour       Int
+  count      Int      @default(0)
+  snapshotAt DateTime @map("snapshot_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, snapshotAt])
+  @@map("audience_online")
+}
+
+model MediaPost {
+  id              String    @id @default(cuid())
+  accountId       String    @map("account_id")
+  igMediaId       String    @unique @map("ig_media_id")
+  mediaType       String    @map("media_type")
+  caption         String?
+  permalink       String?
+  thumbnailUrl    String?   @map("thumbnail_url")
+  likeCount       Int       @default(0) @map("like_count")
+  commentsCount   Int       @default(0) @map("comments_count")
+  reach           Int       @default(0)
+  impressions     Int       @default(0)
+  saved           Int       @default(0)
+  engagementRate  Float     @default(0) @map("engagement_rate")
+  publishedAt     DateTime? @map("published_at")
+  syncedAt        DateTime  @default(now()) @map("synced_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, publishedAt])
+  @@map("media_posts")
+}
+
+model Competitor {
+  id             String   @id @default(cuid())
+  accountId      String   @map("account_id")
+  igUserId       String?  @map("ig_user_id")
+  username       String
+  name           String?
+  followersCount Int      @default(0) @map("followers_count")
+  mediaCount     Int      @default(0) @map("media_count")
+  notes          String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  account Account          @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  posts   CompetitorPost[]
+
+  @@unique([accountId, username])
+  @@map("competitors")
+}
+
+model CompetitorPost {
+  id             String    @id @default(cuid())
+  competitorId   String    @map("competitor_id")
+  igMediaId      String    @map("ig_media_id")
+  mediaType      String    @map("media_type")
+  caption        String?
+  permalink      String?
+  likeCount      Int       @default(0) @map("like_count")
+  commentsCount  Int       @default(0) @map("comments_count")
+  engagementRate Float     @default(0) @map("engagement_rate")
+  publishedAt    DateTime? @map("published_at")
+  syncedAt       DateTime  @default(now()) @map("synced_at")
+
+  competitor Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+
+  @@unique([competitorId, igMediaId])
+  @@index([competitorId, engagementRate])
+  @@map("competitor_posts")
+}
+
+model ScheduledPost {
+  id           String    @id @default(cuid())
+  accountId    String    @map("account_id")
+  mediaType    String    @map("media_type")
+  mediaUrl     String    @map("media_url")
+  caption      String?
+  hashtagSetId String?   @map("hashtag_set_id")
+  scheduledAt  DateTime  @map("scheduled_at")
+  status       String    @default("pending")
+  containerId  String?   @map("container_id")
+  publishedId  String?   @map("published_id")
+  errorMessage String?   @map("error_message")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  account    Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  hashtagSet HashtagSet? @relation(fields: [hashtagSetId], references: [id], onDelete: SetNull)
+
+  @@index([accountId, scheduledAt, status])
+  @@map("scheduled_posts")
+}
+
+model HashtagSet {
+  id               String   @id @default(cuid())
+  accountId        String   @map("account_id")
+  name             String
+  tags             String[]
+  usageCount       Int      @default(0) @map("usage_count")
+  avgReach         Float    @default(0) @map("avg_reach")
+  avgEngagement    Float    @default(0) @map("avg_engagement")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  account        Account         @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  scheduledPosts ScheduledPost[]
+
+  @@map("hashtag_sets")
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  accountId   String   @map("account_id")
+  igCommentId String   @unique @map("ig_comment_id")
+  igMediaId   String   @map("ig_media_id")
+  username    String
+  text        String
+  isHidden    Boolean  @default(false) @map("is_hidden")
+  isRead      Boolean  @default(false) @map("is_read")
+  repliedAt   DateTime? @map("replied_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, isRead, createdAt])
+  @@map("comments")
+}
+
+model Message {
+  id           String   @id @default(cuid())
+  accountId    String   @map("account_id")
+  igMessageId  String   @unique @map("ig_message_id")
+  senderId     String   @map("sender_id")
+  senderName   String   @map("sender_name")
+  text         String
+  isFromUser   Boolean  @default(true) @map("is_from_user")
+  isRead       Boolean  @default(false) @map("is_read")
+  windowEndsAt DateTime? @map("window_ends_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, isRead, createdAt])
+  @@map("messages")
+}
+
+model ReplyTemplate {
+  id        String   @id @default(cuid())
+  accountId String   @map("account_id")
+  name      String
+  keywords  String[]
+  replyText String   @map("reply_text")
+  dmText    String?  @map("dm_text")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("reply_templates")
+}
+
+model AiReport {
+  id          String   @id @default(cuid())
+  accountId   String   @map("account_id")
+  periodStart DateTime @map("period_start")
+  periodEnd   DateTime @map("period_end")
+  summary     String
+  strengths   String
+  weaknesses  String
+  actions     String
+  fullReport  String   @map("full_report")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, createdAt])
+  @@map("ai_reports")
+}
+
+model PerformanceAlert {
+  id        String   @id @default(cuid())
+  accountId String   @map("account_id")
+  type      String
+  message   String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, isRead])
+  @@map("performance_alerts")
+}

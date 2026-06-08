@@ -1,0 +1,24 @@
+{
+  "name": "instagram-ops-tool",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "worker"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=web",
+    "dev:restart": "lsof -ti:3000 -ti:3001 | xargs kill -9 2>/dev/null; npm run dev --workspace=web",
+    "build": "npm run build --workspace=web",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "worker": "npm run start --workspace=worker",
+    "worker:dev": "npm run dev --workspace=worker"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^8.0.0",
+    "prisma": "^6.9.0"
+  }
+}
