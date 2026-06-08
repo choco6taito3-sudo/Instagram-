@@ -12,7 +12,9 @@ const ERROR_MESSAGES: Record<string, string> = {
   no_instagram_account:
     `Instagramビジネス/クリエイターアカウントがFacebookページと連携されていません。@${TARGET_INSTAGRAM.username} をビジネスアカウントに切り替え、Facebookページと連携してください。`,
   token_exchange_failed:
-    "トークンの取得に失敗しました。META_APP_ID・META_APP_SECRET・OAuthリダイレクトURIの設定を確認してください。",
+    "トークンの取得に失敗しました。Vercel の META_REDIRECT_URI が本番URLと完全一致しているか、Meta Developer の OAuth リダイレクト URI と同じか確認してください。",
+  db_failed:
+    "データベースに接続できません。Vercel の DATABASE_URL（postgresql://...）を確認し、npm run db:push を実行してください。",
   meta_not_configured:
     "Metaアプリが未設定です。.env に META_APP_ID と META_APP_SECRET を設定し、devサーバーを再起動してください。",
 };
@@ -24,7 +26,7 @@ const isMetaConfigured = hasMetaAppId && hasMetaAppSecret;
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; detail?: string }>;
 }) {
   const params = await searchParams;
 
@@ -49,7 +51,10 @@ export default async function HomePage({
 
       {errorMessage && (
         <div className="mt-6 max-w-md rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {errorMessage}
+          <p>{errorMessage}</p>
+          {params.detail && (
+            <p className="mt-2 text-xs text-red-600">詳細: {params.detail}</p>
+          )}
         </div>
       )}
 

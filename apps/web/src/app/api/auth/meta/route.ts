@@ -1,13 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getMetaAuthUrl } from "@instagram-ops/sdk";
+import { getAppUrl, getMetaRedirectUri } from "@/lib/config";
 
 export async function GET() {
   const appId = process.env.META_APP_ID;
-  const redirectUri = process.env.META_REDIRECT_URI;
+  const appSecret = process.env.META_APP_SECRET;
+  const redirectUri = getMetaRedirectUri();
 
-  if (!appId || !redirectUri) {
+  if (!appId || !appSecret) {
     return NextResponse.redirect(
-      new URL("/?error=meta_not_configured", process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000")
+      new URL("/?error=meta_not_configured", getAppUrl())
     );
   }
 

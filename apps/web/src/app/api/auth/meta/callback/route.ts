@@ -6,20 +6,26 @@ import {
 } from "@instagram-ops/sdk";
 import { InstagramClient } from "@instagram-ops/sdk";
 import { prisma } from "@/lib/prisma";
+import { getAppUrl, getMetaRedirectUri } from "@/lib/config";
+
+function redirectWithError(error: string, detail?: string) {
+  const url = new URL("/", getAppUrl());
+  url.searchParams.set("error", error);
+  if (detail) url.searchParams.set("detail", detail.slice(0, 200));
+  return NextResponse.redirect(url);
+}
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
   const error = request.nextUrl.searchParams.get("error");
 
   if (error || !code) {
-    return NextResponse.redirect(
-      new URL("/?error=auth_failed", request.url)
-    );
+    return redirectWithError("auth_failed");
   }
 
   const appId = process.env.META_APP_ID!;
   const appSecret = process.env.META_APP_SECRET!;
-  const redirectUri = process.env.META_REDIRECT_URI!;
+  const redirectUri = getMetaRedirectUri();
 
   try {
     const shortToken = await exchangeCodeForToken(
@@ -38,9 +44,7 @@ export async function GET(request: NextRequest) {
     const pageWithIg = pages.find((p) => p.instagram_business_account?.id);
 
     if (!pageWithIg?.instagram_business_account) {
-      return NextResponse.redirect(
-        new URL("/?error=no_instagram_account", request.url)
-      );
+      return redirectWithError("no_instagram_account");
     }
 
     const igUserId = pageWithIg.instagram_business_account.id;
@@ -76,11 +80,19 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/dashboard", getAppUrl()));
   } catch (err) {
     console.error("OAuth callback error:", err);
-    return NextResponse.redirect(
-      new URL("/?error=token_exchange_failed", request.url)
-    );
+    const message = err instanceof Error ? err.message : "Unknown error";
+
+    if (
+      message.includes("P1001") ||
+      message.includes("Can't reach database") ||
+      message.includes("database server")
+    ) {
+      return redirectWithError("db_failed");
+    }
+
+    return redirectWithError("token_exchange_failed", message);
   }
 }
