@@ -14,7 +14,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   token_exchange_failed:
     "トークンの取得に失敗しました。Vercel の META_REDIRECT_URI が本番URLと完全一致しているか、Meta Developer の OAuth リダイレクト URI と同じか確認してください。",
   db_failed:
-    "データベースに接続できません。Vercel の DATABASE_URL（postgresql://...）を確認し、npm run db:push を実行してください。",
+    "データベースへの保存に失敗しました。Vercel の DATABASE_URL がローカルの .env と同じ postgresql://... 形式か確認し、Redeploy してください。",
   meta_not_configured:
     "Metaアプリが未設定です。.env に META_APP_ID と META_APP_SECRET を設定し、devサーバーを再起動してください。",
 };

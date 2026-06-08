@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import {
   exchangeCodeForToken,
@@ -53,7 +54,9 @@ export async function GET(request: NextRequest) {
     const igUser = await client.getUser(igUserId);
 
     const expiresAt = new Date();
-    expiresAt.setSeconds(expiresAt.getSeconds() + longToken.expires_in);
+    expiresAt.setSeconds(
+      expiresAt.getSeconds() + (longToken.expires_in || 60 * 24 * 60 * 60)
+    );
 
     await prisma.account.upsert({
       where: { igUserId },
@@ -85,12 +88,17 @@ export async function GET(request: NextRequest) {
     console.error("OAuth callback error:", err);
     const message = err instanceof Error ? err.message : "Unknown error";
 
-    if (
+    const isDbError =
+      err instanceof Prisma.PrismaClientKnownRequestError ||
+      err instanceof Prisma.PrismaClientInitializationError ||
+      err instanceof Prisma.PrismaClientValidationError ||
       message.includes("P1001") ||
       message.includes("Can't reach database") ||
-      message.includes("database server")
-    ) {
-      return redirectWithError("db_failed");
+      message.includes("database server") ||
+      message.includes("prisma.");
+
+    if (isDbError) {
+      return redirectWithError("db_failed", message);
     }
 
     return redirectWithError("token_exchange_failed", message);
