@@ -1,4 +1,5 @@
 import { Sidebar } from "@/components/sidebar";
+import { DemoBanner } from "@/components/demo-banner";
 import { getActiveAccount } from "@/lib/account";
 import { TARGET_INSTAGRAM } from "@/lib/config";
 
@@ -18,9 +19,12 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar username={username} />
-      <main className="flex-1 overflow-auto p-8">{children}</main>
+    <div className="flex min-h-screen flex-col">
+      <DemoBanner />
+      <div className="flex flex-1">
+        <Sidebar username={username} />
+        <main className="flex-1 overflow-auto p-8">{children}</main>
+      </div>
     </div>
   );
 }

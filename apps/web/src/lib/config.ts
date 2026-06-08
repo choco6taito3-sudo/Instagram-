@@ -20,3 +20,8 @@ export function getAppUrl(): string {
     "http://localhost:3000"
   );
 }
+
+/** ポートフォリオ公開用: true でログイン不要・サンプルデータ表示 */
+export function isPortfolioDemo(): boolean {
+  return process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+}

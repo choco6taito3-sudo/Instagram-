@@ -1,6 +1,8 @@
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { getActiveAccount } from "@/lib/account";
 import { prisma } from "@/lib/prisma";
+import { demoHashtagSets } from "@/lib/demo-data";
+import { isPortfolioDemo } from "@/lib/config";
 import { HashtagForm } from "./hashtag-form";
 import { Badge } from "@/components/ui/badge";
 
@@ -20,7 +22,12 @@ async function getHashtagSets() {
 
 export default async function HashtagsPage() {
   const data = await getHashtagSets();
-  const totalTags = data?.sets.reduce((s, set) => s + set.tags.length, 0) || 0;
+  const sets = data?.sets.length
+    ? data.sets
+    : isPortfolioDemo()
+      ? demoHashtagSets
+      : [];
+  const totalTags = sets.reduce((s, set) => s + set.tags.length, 0);
 
   return (
     <div className="space-y-8">
@@ -61,7 +68,7 @@ export default async function HashtagsPage() {
       </Card>
 
       <div className="grid gap-4 md:grid-cols-2">
-        {data?.sets.map((set) => (
+        {sets.map((set) => (
           <Card key={set.id}>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -97,7 +104,7 @@ export default async function HashtagsPage() {
         ))}
       </div>
 
-      {!data?.sets.length && (
+      {!sets.length && (
         <p className="text-center text-sm text-zinc-500">
           ハッシュタグセットを作成してください
         </p>

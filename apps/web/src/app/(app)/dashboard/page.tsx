@@ -4,7 +4,7 @@ import { InsightsChart } from "@/components/charts/insights-chart";
 import { getActiveAccount } from "@/lib/account";
 import { prisma } from "@/lib/prisma";
 import { generateDemoInsights, toChartPoint, type InsightChartPoint } from "@/lib/demo-data";
-import { TARGET_INSTAGRAM } from "@/lib/config";
+import { TARGET_INSTAGRAM, isPortfolioDemo } from "@/lib/config";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import Link from "next/link";
@@ -49,7 +49,7 @@ async function getDashboardData() {
 
 export default async function DashboardPage() {
   const data = await getDashboardData();
-  const isDemo = !data;
+  const isDemo = isPortfolioDemo() || !data;
 
   const account = data?.account ?? {
     username: TARGET_INSTAGRAM.username,

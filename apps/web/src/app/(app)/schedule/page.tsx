@@ -1,6 +1,8 @@
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { getActiveAccount } from "@/lib/account";
 import { prisma } from "@/lib/prisma";
+import { demoScheduledPosts, demoHashtagSets } from "@/lib/demo-data";
+import { isPortfolioDemo } from "@/lib/config";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +38,16 @@ async function getScheduleData() {
 
 export default async function SchedulePage() {
   const data = await getScheduleData();
+  const posts = data?.posts?.length
+    ? data.posts
+    : isPortfolioDemo()
+      ? demoScheduledPosts
+      : [];
+  const hashtagSets = data?.hashtagSets?.length
+    ? data.hashtagSets
+    : isPortfolioDemo()
+      ? demoHashtagSets
+      : [];
 
   return (
     <div className="space-y-8">
@@ -49,7 +61,7 @@ export default async function SchedulePage() {
           <CardHeader>
             <CardTitle>新規予約投稿</CardTitle>
           </CardHeader>
-          <ScheduleForm hashtagSets={data?.hashtagSets || []} />
+          <ScheduleForm hashtagSets={hashtagSets} />
         </Card>
 
         <Card>
@@ -64,7 +76,7 @@ export default async function SchedulePage() {
               const day = i - new Date().getDay() + 1;
               const date = new Date();
               date.setDate(date.getDate() + day);
-              const dayPosts = (data?.posts || []).filter(
+              const dayPosts = posts.filter(
                 (p) =>
                   format(p.scheduledAt, "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
               );
@@ -97,9 +109,9 @@ export default async function SchedulePage() {
         <CardHeader>
           <CardTitle>予約一覧</CardTitle>
         </CardHeader>
-        {data?.posts.length ? (
+        {posts.length ? (
           <div className="space-y-3">
-            {data.posts.map((post) => {
+            {posts.map((post) => {
               const status = statusLabels[post.status] || statusLabels.pending;
               return (
                 <div

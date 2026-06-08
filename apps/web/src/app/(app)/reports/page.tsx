@@ -1,6 +1,8 @@
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { getActiveAccount } from "@/lib/account";
 import { prisma } from "@/lib/prisma";
+import { demoReports } from "@/lib/demo-data";
+import { isPortfolioDemo } from "@/lib/config";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { GenerateReportButton } from "./generate-button";
@@ -26,6 +28,11 @@ async function getReports() {
 
 export default async function ReportsPage() {
   const data = await getReports();
+  const reports = data?.reports.length
+    ? data.reports
+    : isPortfolioDemo()
+      ? demoReports
+      : [];
 
   return (
     <div className="space-y-8">
@@ -39,8 +46,8 @@ export default async function ReportsPage() {
         <GenerateReportButton />
       </div>
 
-      {data?.reports.length ? (
-        data.reports.map((report) => (
+      {reports.length ? (
+        reports.map((report) => (
           <Card key={report.id}>
             <CardHeader>
               <div className="flex items-center justify-between">

@@ -4,6 +4,7 @@ import { InsightsChart } from "@/components/charts/insights-chart";
 import { getActiveAccount } from "@/lib/account";
 import { prisma } from "@/lib/prisma";
 import { generateDemoInsights, toChartPoint, type InsightChartPoint, type MediaPostSummary } from "@/lib/demo-data";
+import { isPortfolioDemo } from "@/lib/config";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { AnalyticsPeriodSelector } from "./period-selector";
@@ -41,7 +42,7 @@ export default async function AnalyticsPage({
   const params = await searchParams;
   const period = Number(params.period) || 30;
   const data = await getAnalytics(period);
-  const isDemo = !data;
+  const isDemo = isPortfolioDemo() || !data;
 
   const insights: InsightChartPoint[] = data?.insights.length
     ? data.insights.map(toChartPoint)

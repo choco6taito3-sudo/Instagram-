@@ -7,6 +7,7 @@ import { OnlineHeatmap } from "@/components/charts/online-heatmap";
 import { getActiveAccount } from "@/lib/account";
 import { prisma } from "@/lib/prisma";
 import { demoDemographics, generateDemoOnline } from "@/lib/demo-data";
+import { isPortfolioDemo } from "@/lib/config";
 import { Badge } from "@/components/ui/badge";
 
 async function getAudienceData() {
@@ -37,7 +38,7 @@ async function getAudienceData() {
 
 export default async function AudiencePage() {
   const data = await getAudienceData();
-  const isDemo = !data;
+  const isDemo = isPortfolioDemo() || !data;
 
   const age = data?.demographics.age?.map((d) => ({
     value: d.value,

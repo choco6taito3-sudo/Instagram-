@@ -1,6 +1,8 @@
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { getActiveAccount } from "@/lib/account";
 import { prisma } from "@/lib/prisma";
+import { demoCompetitors, demoTopCompetitorPosts } from "@/lib/demo-data";
+import { isPortfolioDemo } from "@/lib/config";
 import { formatNumber } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { CompetitorForm } from "./competitor-form";
@@ -43,6 +45,17 @@ async function getCompetitors() {
 
 export default async function CompetitorsPage() {
   const data = await getCompetitors();
+  const competitors = data?.competitors.length
+    ? data.competitors
+    : isPortfolioDemo()
+      ? demoCompetitors
+      : [];
+  const topPosts = data?.topPosts.length
+    ? data.topPosts
+    : isPortfolioDemo()
+      ? demoTopCompetitorPosts
+      : [];
+  const ownAvgEngagement = data?.ownAvgEngagement ?? (isPortfolioDemo() ? 4.2 : 0);
 
   return (
     <div className="space-y-8">
@@ -61,19 +74,19 @@ export default async function CompetitorsPage() {
         <CompetitorForm />
       </Card>
 
-      {data && (
+      {(data || isPortfolioDemo()) && (
         <div className="grid gap-4 sm:grid-cols-3">
           <Card>
             <p className="text-sm text-zinc-500">自アカウント平均ER</p>
-            <p className="text-2xl font-bold">{data.ownAvgEngagement.toFixed(1)}%</p>
+            <p className="text-2xl font-bold">{ownAvgEngagement.toFixed(1)}%</p>
           </Card>
           <Card>
             <p className="text-sm text-zinc-500">登録競合数</p>
-            <p className="text-2xl font-bold">{data.competitors.length}</p>
+            <p className="text-2xl font-bold">{competitors.length}</p>
           </Card>
           <Card>
             <p className="text-sm text-zinc-500">分析対象投稿</p>
-            <p className="text-2xl font-bold">{data.topPosts.length}</p>
+            <p className="text-2xl font-bold">{topPosts.length}</p>
           </Card>
         </div>
       )}
@@ -82,9 +95,9 @@ export default async function CompetitorsPage() {
         <CardHeader>
           <CardTitle>競合アカウント一覧</CardTitle>
         </CardHeader>
-        {data?.competitors.length ? (
+        {competitors.length ? (
           <div className="space-y-4">
-            {data.competitors.map((c) => (
+            {competitors.map((c) => (
               <div
                 key={c.id}
                 className="flex items-center justify-between rounded-lg border border-zinc-100 p-4 dark:border-zinc-800"
@@ -114,9 +127,9 @@ export default async function CompetitorsPage() {
           <CardTitle>伸びている投稿</CardTitle>
           <CardDescription>エンゲージメント率ランキング（公開データ）</CardDescription>
         </CardHeader>
-        {data?.topPosts.length ? (
+        {topPosts.length ? (
           <div className="space-y-3">
-            {data.topPosts.map((post, i) => (
+            {topPosts.map((post, i) => (
               <div
                 key={post.id}
                 className="flex items-center justify-between rounded-lg border border-zinc-100 p-3 dark:border-zinc-800"

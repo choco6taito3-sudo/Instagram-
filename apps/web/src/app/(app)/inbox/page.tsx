@@ -1,6 +1,8 @@
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { getActiveAccount } from "@/lib/account";
 import { prisma } from "@/lib/prisma";
+import { demoInbox } from "@/lib/demo-data";
+import { isPortfolioDemo } from "@/lib/config";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import {
@@ -41,6 +43,7 @@ async function getInboxData() {
 
 export default async function InboxPage() {
   const data = await getInboxData();
+  const inbox = data ?? (isPortfolioDemo() ? demoInbox : null);
 
   return (
     <div className="space-y-8">
@@ -52,11 +55,11 @@ export default async function InboxPage() {
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>
           <p className="text-sm text-zinc-500">未読コメント</p>
-          <p className="text-2xl font-bold">{data?.unreadComments ?? 0}</p>
+          <p className="text-2xl font-bold">{inbox?.unreadComments ?? 0}</p>
         </Card>
         <Card>
           <p className="text-sm text-zinc-500">未読DM</p>
-          <p className="text-2xl font-bold">{data?.unreadMessages ?? 0}</p>
+          <p className="text-2xl font-bold">{inbox?.unreadMessages ?? 0}</p>
         </Card>
       </div>
 
@@ -64,7 +67,7 @@ export default async function InboxPage() {
         <CardHeader>
           <CardTitle>自動返信テンプレート</CardTitle>
         </CardHeader>
-        <InboxClient templates={data?.templates ?? []} />
+        <InboxClient templates={inbox?.templates ?? []} />
       </Card>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -72,9 +75,9 @@ export default async function InboxPage() {
           <CardHeader>
             <CardTitle>コメント</CardTitle>
           </CardHeader>
-          {data?.comments.length ? (
+          {inbox?.comments.length ? (
             <div className="space-y-3">
-              {data.comments.map((comment) => (
+              {inbox.comments.map((comment) => (
                 <div
                   key={comment.id}
                   className={`rounded-lg border p-3 ${
@@ -105,9 +108,9 @@ export default async function InboxPage() {
           <CardHeader>
             <CardTitle>DM</CardTitle>
           </CardHeader>
-          {data?.messages.length ? (
+          {inbox?.messages.length ? (
             <div className="space-y-3">
-              {data.messages.map((msg) => (
+              {inbox.messages.map((msg) => (
                 <div
                   key={msg.id}
                   className={`rounded-lg border p-3 ${

@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getActiveAccount } from "@/lib/account";
 import { Button } from "@/components/ui/button";
 import { Instagram } from "lucide-react";
-import { TARGET_INSTAGRAM } from "@/lib/config";
+import { TARGET_INSTAGRAM, isPortfolioDemo } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +29,10 @@ export default async function HomePage({
   searchParams: Promise<{ error?: string; detail?: string }>;
 }) {
   const params = await searchParams;
+
+  if (isPortfolioDemo()) {
+    redirect("/dashboard");
+  }
 
   try {
     const account = await getActiveAccount();
